@@ -2,7 +2,8 @@ library(shiny)
 library(ggplot2)
 library(tidyverse)
 
-url <- "https://free.entryscape.com/store/360/resource/15"
+# Url to FHMs csv, updated daily
+url <- "https://free.entryscape.com/store/360/resource/15" 
 latest.file <- paste0("fhmCases",Sys.Date(), ".csv")
 
 # Update and deploy #
@@ -12,25 +13,29 @@ latest.file <- paste0("fhmCases",Sys.Date(), ".csv")
 if (!file.exists(latest.file)) {
   download.file(url, latest.file)
 }
+
 fhm <- read.csv(latest.file)
 
 function(input, output) {
 
   output$covid <- renderPlot({
     
+    # Remove redundant variables
     fhm.l <- fhm %>% mutate(Statistikdatum=as.Date(Statistikdatum)) %>%
       select(-c(Antal_avlidna, Antal_intensivvardade, 
                 Kumulativa_fall, Kumulativa_avlidna, 
                 Kumulativa_intensivvardade,
                 Totalt_antal_fall))
     
-    fhm.l <- fhm.l%>% #filter(Statistikdatum > "2021-01-01") %>%
+    # User chooses regions, convert to long format
+    fhm.l <- fhm.l%>% 
       select(c(Statistikdatum, input$region)) %>%
       pivot_longer(-c(Statistikdatum),values_to = "cases") %>%
       group_by(name) %>%
       arrange(name, Statistikdatum, .by_group = T) %>%
       mutate(name=as.factor(name)) 
     
+    #Plotting
     fhm.p <- ggplot(data = fhm.l, 
                     aes(x=Statistikdatum, y=cases, group=name, color=name))+
     geom_point(size=(0.8/length(input$region)))+
@@ -42,7 +47,8 @@ function(input, output) {
           axis.text.y = element_blank(),
           axis.ticks.y = element_line(size = 0), 
           axis.title = element_blank())
-
+    
+    # User settings
     if(input$smoothing)
       fhm.p <- fhm.p + geom_smooth()
     

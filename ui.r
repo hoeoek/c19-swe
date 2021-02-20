@@ -1,7 +1,8 @@
 library(shiny)
-library(ggplot2)
+# library(ggplot2) Shouldnt be needed here
 library(dplyr)
 
+# Users choice of regions
 dropdown <- c("Blekinge", "Dalarna", "Gotland", "Gävleborg", "Halland",
               "Jämtland", "Jönköping", "Kalmar", "Kronoberg", "Norrbotten",
               "Skåne", "Stockholm", "Södermanland", "Uppsala", "Värmland",
@@ -22,9 +23,11 @@ fluidPage(
     dateRangeInput(inputId = "daterange", 
                    label = "Datumintervall", 
                    start = "2020-01-01"),
+    
     checkboxGroupInput("region", "Regioner", 
                 choices = dropdown,
                 selected = "Västerbotten", inline = T),
+    
     checkboxInput("smoothing", "Trendlinje", value = T)
   ),
   
