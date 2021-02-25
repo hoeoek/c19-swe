@@ -1,6 +1,7 @@
 library(shiny)
 # library(ggplot2) Shouldnt be needed here
 library(dplyr)
+library(stringr)
 
 # Users choice of regions
 dropdown <- c("Blekinge", "Dalarna", "Gotland", "Gävleborg", "Halland",
